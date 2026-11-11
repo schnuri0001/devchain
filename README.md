@@ -1,1 +1,2 @@
-# schnur.github.io
+# Schnur Webseite
+Noch in Entwicklung!
