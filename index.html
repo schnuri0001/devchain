@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nordlicht Studio — Digitale Erlebnisse</title>
+<meta name="description" content="Wir gestalten Websites, die begeistern. Design, Entwicklung und Strategie aus einer Hand." />
+<style>
+  /* ---------- Design Tokens ---------- */
+  :root {
+    --bg: #0b0d12;
+    --bg-soft: #12151d;
+    --card: #161a24;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #eef1f7;
+    --muted: #98a1b3;
+    --accent: #6c8cff;
+    --accent-2: #b06cff;
+    --gradient: linear-gradient(120deg, var(--accent), var(--accent-2));
+    --radius: 18px;
+    --max: 1160px;
+    --shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.8);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Sanfter Farbschimmer im Hintergrund */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(50% 40% at 15% 0%, rgba(108, 140, 255, 0.18), transparent 70%),
+      radial-gradient(45% 40% at 85% 5%, rgba(176, 108, 255, 0.16), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
+    padding-inline: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Navigation ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    background: rgba(11, 13, 18, 0.7);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  header.scrolled {
+    border-bottom-color: var(--border);
+    background: rgba(11, 13, 18, 0.9);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.05rem;
+  }
+  .logo-mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: var(--gradient);
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    color: #fff;
+    box-shadow: 0 6px 18px -6px var(--accent);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    font-size: 0.94rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -6px;
+    width: 0; height: 2px;
+    background: var(--gradient);
+    border-radius: 2px;
+    transition: width 0.25s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.94rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--gradient);
+    color: #fff;
+    box-shadow: 0 12px 34px -14px var(--accent);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -14px var(--accent-2);
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .nav-cta { display: flex; align-items: center; gap: 12px; }
+
+  /* Burger */
+  .burger {
+    display: none;
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+  }
+  .burger span {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    width: 18px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.28s ease;
+  }
+  .burger span:nth-child(1) { top: 15px; }
+  .burger span:nth-child(2) { top: 20px; }
+  .burger span:nth-child(3) { top: 25px; }
+  .burger.active span:nth-child(1) { top: 20px; transform: translateX(-50%) rotate(45deg); }
+  .burger.active span:nth-child(2) { opacity: 0; }
+  .burger.active span:nth-child(3) { top: 20px; transform: translateX(-50%) rotate(-45deg); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: clamp(60px, 10vw, 120px) 0 clamp(60px, 8vw, 100px);
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 16px 7px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .badge .dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--gradient);
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6.5vw, 4.4rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    max-width: 17ch;
+    margin: 0 auto 24px;
+  }
+  .grad-text {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    max-width: 56ch;
+    margin: 0 auto 38px;
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 64px;
+  }
+  .hero-actions .btn { padding: 15px 28px; font-size: 1rem; }
+
+  /* Preview-Mockup */
+  .preview {
+    position: relative;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+    padding: 10px;
+    box-shadow: var(--shadow);
+    max-width: 940px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .preview-bar {
+    display: flex;
+    gap: 7px;
+    padding: 8px 10px 14px;
+  }
+  .preview-bar i {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .preview-body {
+    border-radius: 14px;
+    background: var(--bg-soft);
+    padding: clamp(20px, 4vw, 40px);
+    display: grid;
+    gap: 18px;
+    text-align: left;
+  }
+  .skel {
+    height: 12px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0.14), rgba(255,255,255,0.07));
+    background-size: 200% 100%;
+    animation: shimmer 2.6s infinite linear;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .preview-card {
+    height: 84px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+  }
+  .preview-hero-skel { height: 22px; width: 58%; border-radius: 10px; background: var(--gradient); opacity: .85; }
+
+  /* ---------- Stats ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 56px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-top: 80px;
+  }
+  .stat b {
+    display: block;
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    letter-spacing: -0.03em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+  }
+  .stat span { color: var(--muted); font-size: 0.9rem; }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; z-index: 1; }
+
+  .section-head {
+    text-align: center;
+    max-width: 60ch;
+    margin: 0 auto 56px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .section-head p { color: var(--muted); font-size: 1.03rem; }
+
+  #leistungen { padding: 100px 0; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 26px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 60% at 50% 0%, rgba(108,140,255,0.14), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(108, 140, 255, 0.35);
+    box-shadow: 0 24px 50px -28px rgba(108, 140, 255, 0.7);
+  }
+  .card:hover::after { opacity: 1; }
+
+  .card-icon {
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    font-size: 21px;
+    background: rgba(108, 140, 255, 0.12);
+    border: 1px solid rgba(108, 140, 255, 0.25);
+    margin-bottom: 20px;
+  }
+  .card h3 {
+    font-size: 1.16rem;
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+  .card p { color: var(--muted); font-size: 0.95rem; }
+
+  /* ---------- CTA ---------- */
+  .cta-wrap { padding: 20px 0 110px; }
+  .cta {
+    border-radius: 26px;
+    padding: clamp(40px, 7vw, 72px) clamp(24px, 5vw, 64px);
+    text-align: center;
+    background:
+      radial-gradient(90% 140% at 50% 0%, rgba(108, 140, 255, 0.28), transparent 65%),
+      linear-gradient(180deg, #1a1f2e, #12151d);
+    border: 1px solid rgba(108, 140, 255, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta h2 { max-width: 22ch; margin-inline: auto; }
+  .cta p { color: var(--muted); margin: 0 auto 32px; max-width: 50ch; }
+  .cta .hero-actions { margin-bottom: 0; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-inner p { color: var(--muted); font-size: 0.88rem; }
+  .footer-links { display: flex; gap: 24px; list-style: none; }
+  .footer-links a { color: var(--muted); font-size: 0.88rem; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ---------- Reveal-Animation ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s cubic-bezier(.22,.8,.3,1), transform 0.7s cubic-bezier(.22,.8,.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+    .preview-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 760px) {
+    .burger { display: block; }
+    .nav-links {
+      position: absolute;
+      top: 72px; left: 0; right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      background: rgba(13, 16, 23, 0.98);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 24px 20px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.35s ease;
+    }
+    .nav-links.open {
+      max-height: 320px;
+      opacity: 1;
+    }
+    .nav-links li { border-bottom: 1px solid var(--border); }
+    .nav-links li:last-child { border-bottom: none; }
+    .nav-links a { display: block; padding: 14px 0; font-size: 1rem; }
+    .nav-links a::after { display: none; }
+    .nav-cta .btn-ghost { display: none; }
+    .cards { grid-template-columns: 1fr; }
+    .preview-grid { grid-template-columns: 1fr; }
+    .hero-actions .btn { width: 100%; max-width: 320px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAVIGATION ================= -->
+<header id="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="#" class="logo" aria-label="Nordlicht Studio Startseite">
+        <span class="logo-mark">✦</span>
+        Nordlicht<span style="color: var(--accent)">.</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#arbeiten">Arbeiten</a></li>
+        <li><a href="#prozess">Prozess</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="#kontakt" class="btn btn-ghost">Anmelden</a>
+        <a href="#kontakt" class="btn btn-primary">Projekt starten</a>
+        <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false" aria-controls="navLinks">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="container">
+    <div class="badge reveal">
+      <span class="dot">✦</span>
+      Jetzt verfügbar für neue Projekte
+    </div>
+
+    <h1 class="reveal">
+      Wir bauen Websites, die <span class="grad-text">im Kopf bleiben</span>.
+    </h1>
+
+    <p class="reveal">
+      Strategie, Design und Entwicklung aus einer Hand — schnell, barrierefrei
+      und auf jedes Gerät perfekt abgestimmt.
+    </p>
+
+    <div class="hero-actions reveal">
+      <a href="#kontakt" class="btn btn-primary">Kostenloses Erstgespräch →</a>
+      <a href="#arbeiten" class="btn btn-ghost">Arbeiten ansehen</a>
+    </div>
+
+    <div class="preview reveal">
+      <div class="preview-bar"><i></i><i></i><i></i></div>
+      <div class="preview-body">
+        <div class="preview-hero-skel"></div>
+        <div class="skel" style="width: 78%"></div>
+        <div class="skel" style="width: 54%"></div>
+        <div class="preview-grid">
+          <div class="preview-card"></div>
+          <div class="preview-card"></div>
+          <div class="preview-card"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><b>120+</b><span>Projekte umgesetzt</span></div>
+      <div class="stat"><b>98%</b><span>Zufriedene Kunden</span></div>
+      <div class="stat"><b>0,9s</b><span>Ø Ladezeit</span></div>
+      <div class="stat"><b>9 Jahre</b><span>Erfahrung im Team</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LEISTUNGEN ================= -->
+<section id="leistungen">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Leistungen</span>
+      <h2>Alles, was deine Website braucht</h2>
+      <p>Vom ersten Konzept bis zum Launch — wir übernehmen jeden Schritt und halten dich auf dem Laufenden.</p>
+    </div>
+
+    <div class="cards">
+      <article class="card reveal">
+        <div class="card-icon">🎨</div>
+        <h3>Webdesign</h3>
+        <p>Individuelle Layouts mit klarer Typografie, durchdachten Farben und einem roten Faden für deine Marke.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-icon">⚡</div>
+        <h3>Entwicklung</h3>
+        <p>Sauberer Code, blitzschnelle Ladezeiten und moderne Technologien — wartbar und zukunftssicher.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-icon">📈</div>
+        <h3>SEO &amp; Performance</h3>
+        <p>Technisches SEO, Core Web Vitals und messbare Ergebnisse, die deine Sichtbarkeit steigern.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-icon">📱</div>
+        <h3>Responsive Design</h3>
+        <p>Perfekte Darstellung auf Smartphone, Tablet und Desktop — ohne Kompromisse.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-icon">♿</div>
+        <h3>Barrierefreiheit</h3>
+        <p>WCAG-konforme Umsetzung mit Tastaturnavigation, sinnvollen Kontrasten und Semantik.</p>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-icon">🛠️</div>
+        <h3>Wartung &amp; Support</h3>
+        <p>Updates, Backups und persönlicher Support — damit deine Seite immer aktuell bleibt.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta-wrap" id="kontakt">
+  <div class="container">
+    <div class="cta reveal">
+      <span class="eyebrow">Los geht's</span>
+      <h2>Bereit für eine Website, die verkauft?</h2>
+      <p>Erzähl uns kurz von deinem Projekt. Wir melden uns innerhalb von 24 Stunden mit einer ersten Einschätzung.</p>
+      <div class="hero-actions">
+        <a href="mailto:hallo@nordlicht.studio" class="btn btn-primary">hallo@nordlicht.studio</a>
+        <a href="#" class="btn btn-ghost">Termin buchen</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container footer-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">✦</span>
+      Nordlicht<span style="color: var(--accent)">.</span>
+    </a>
+    <ul class="footer-links">
+      <li><a href="#leistungen">Leistungen</a></li>
+      <li><a href="#arbeiten">Arbeiten</a></li>
+      <li><a href="#">Impressum</a></li>
+      <li><a href="#">Datenschutz</a></li>
+    </ul>
+    <p>© <span id="year"></span> Nordlicht Studio. Alle Rechte vorbehalten.</p>
+  </div>
+</footer>
+
+<script>
+  /* ---------- Jahr im Footer ---------- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---------- Mobile Menü ---------- */
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+
+  burger.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+    burger.classList.toggle('active', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+    burger.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
+  });
+
+  // Menü schließen bei Klick auf einen Link
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      burger.classList.remove('active');
+      burger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  /* ---------- Header-Schatten beim Scrollen ---------- */
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 10);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---------- Reveal on Scroll ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // leichter Versatz für Gruppen
+          entry.target.style.transitionDelay = `${Math.min(i * 60, 240)}ms`;
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('visible'));
+  }
+</script>
+</body>
+</html>
