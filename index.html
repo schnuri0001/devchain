@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ABSOLUTE CHAOS</title>
+<title>SYSTEM OVERLOAD</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
 
   :root {
     --bg: #050505;
     --text: #ffffff;
-    --accent-1: #6c8cff;
-    --accent-2: #b06cff;
-    --accent-3: #ff6c9c;
+    --accent-1: #00ffcc;
+    --accent-2: #ff00ea;
+    --accent-3: #ffaa00;
   }
 
   * {
@@ -32,7 +32,7 @@
     justify-content: center;
     align-items: center;
     perspective: 1200px;
-    transition: background-color 0.5s ease;
+    transition: background-color 0.1s ease; /* Sehr schneller Farbwechsel */
   }
 
   /* =========================================
@@ -59,119 +59,130 @@
 
   .blob {
     position: absolute;
-    width: 50vw;
-    height: 50vw;
-    opacity: 0.5;
-    animation: morph 10s infinite alternate ease-in-out, float 15s infinite alternate ease-in-out;
-    transition: background-color 1s ease;
+    width: 60vw;
+    height: 60vw;
+    opacity: 0.6;
+    animation: morph 6s infinite alternate ease-in-out, float 10s infinite alternate ease-in-out;
+    transition: background-color 0.5s ease;
   }
 
-  .blob-1 { background: var(--accent-1); top: -10%; left: -10%; }
-  .blob-2 { background: var(--accent-2); bottom: -10%; right: -10%; animation-delay: -5s; }
-  .blob-3 { background: var(--accent-3); top: 30%; left: 40%; width: 40vw; height: 40vw; animation-delay: -8s; }
+  .blob-1 { background: var(--accent-1); top: -20%; left: -10%; }
+  .blob-2 { background: var(--accent-2); bottom: -20%; right: -10%; animation-delay: -3s; }
+  .blob-3 { background: var(--accent-3); top: 20%; left: 30%; width: 50vw; height: 50vw; animation-delay: -5s; }
 
   @keyframes morph {
     0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-    34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
-    67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+    50% { border-radius: 100% 0% 0% 100% / 100% 100% 0% 0%; }
     100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
   }
 
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(20vw, 20vh) scale(1.2); }
+    100% { transform: translate(30vw, 30vh) scale(1.5); }
   }
 
-  /* Pulsierendes Raster */
+  /* Warp Grid */
   .grid-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
     background-image: 
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
     pointer-events: none;
-    animation: pulseGrid 4s infinite alternate;
+    animation: warpGrid 2s infinite linear;
   }
 
-  @keyframes pulseGrid {
-    0% { transform: scale(1); opacity: 0.5; }
-    100% { transform: scale(1.05); opacity: 1; }
+  @keyframes warpGrid {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); }
   }
 
   /* =========================================
-     2. MARQUEE (Endlos-Text im Hintergrund)
+     2. SCANLINES & FLICKER
      ========================================= */
-  .marquee-wrapper {
-    position: absolute;
-    width: 200vw;
-    z-index: 1;
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100vh;
-    padding: 10vh 0;
-    overflow: hidden;
-    opacity: 0.15;
-    mix-blend-mode: overlay;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.3));
+    background-size: 100% 4px;
+    animation: scanlineMove 10s linear infinite;
   }
 
-  .marquee {
-    white-space: nowrap;
-    font-size: 8vw;
-    font-weight: 700;
-    color: transparent;
-    -webkit-text-stroke: 2px #fff;
-    text-transform: uppercase;
-    line-height: 1;
+  @keyframes scanlineMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100vh; }
   }
 
-  .marquee-top { animation: scrollLeft 15s linear infinite; }
-  .marquee-bottom { animation: scrollRight 18s linear infinite; }
-
-  @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  .screen-flicker {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
   }
-  @keyframes scrollRight {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
+
+  @keyframes flicker {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    20% { opacity: 0; }
+    30% { opacity: 0; }
+    40% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 0; }
   }
 
   /* =========================================
-     3. HAUPTINHALT
+     3. HAUPTINHALT & CSS KREIS
      ========================================= */
   .wrapper {
     position: relative;
     z-index: 2;
     text-align: center;
-    mix-blend-mode: exclusion;
     pointer-events: none;
     transform-style: preserve-3d;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.05s ease-out;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    mix-blend-mode: exclusion;
   }
 
-  /* Der rotierende Text-Ring */
-  .spinning-ring {
+  /* Kreisender Text (CSS Version - Bugfrei) */
+  .circle-container {
     position: absolute;
-    width: 600px;
-    height: 600px;
-    animation: spin 20s linear infinite;
+    width: 700px;
+    height: 700px;
+    animation: spin 15s linear infinite;
     z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  
-  .spinning-ring text {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 24px;
+
+  .circle-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: spin 15s linear infinite;
+  }
+
+  .circle-text span {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: 20px;
+    font-weight: 700;
     letter-spacing: 8px;
-    fill: var(--text);
-    opacity: 0.6;
+    color: rgba(255, 255, 255, 0.4);
+    transform-origin: 0 350px; /* Radius des Kreises */
     text-transform: uppercase;
   }
 
@@ -185,13 +196,13 @@
   }
 
   h1 {
-    font-size: clamp(4rem, 15vw, 12rem);
-    line-height: 0.85;
+    font-size: clamp(5rem, 18vw, 15rem);
+    line-height: 0.8;
     text-transform: uppercase;
     letter-spacing: -0.05em;
     font-weight: 700;
     position: relative;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+    text-shadow: 0 0 30px rgba(255,255,255,0.2);
   }
 
   /* Glitch Ebenen */
@@ -204,17 +215,17 @@
   }
   
   h1::before {
-    left: 3px;
-    text-shadow: -3px 0 red;
-    clip: rect(24px, 550px, 90px, 0);
-    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+    left: 5px;
+    text-shadow: -5px 0 cyan;
+    clip: rect(20px, 9999px, 80px, 0);
+    animation: glitch-anim-1 0.5s infinite linear alternate-reverse;
   }
 
   h1::after {
-    left: -3px;
-    text-shadow: -3px 0 blue;
-    clip: rect(85px, 550px, 140px, 0);
-    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    left: -5px;
+    text-shadow: 5px 0 magenta;
+    clip: rect(60px, 9999px, 120px, 0);
+    animation: glitch-anim-2 0.4s infinite linear alternate-reverse;
   }
 
   @keyframes glitch-anim-1 {
@@ -235,41 +246,71 @@
     100% { clip: rect(20px, 9999px, 70px, 0); }
   }
 
-  .subtitle {
-    font-size: clamp(0.8rem, 2vw, 1.2rem);
-    margin-top: 40px;
-    opacity: 0.8;
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
-    animation: pulseText 2s infinite alternate;
-  }
-
-  @keyframes pulseText {
-    0% { opacity: 0.3; letter-spacing: 0.5em; }
-    100% { opacity: 1; letter-spacing: 0.6em; }
-  }
-
   /* =========================================
-     4. EFFEKTE & OVERLAYS
+     4. AUDIO VISUALIZER & SPAWNING
      ========================================= */
   
+  /* Fake Visualizer */
+  .visualizer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 5px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .bar {
+    width: 15px;
+    background: var(--text);
+    transition: height 0.05s ease;
+  }
+
+  /* Spawnende Formen & Text */
+  .spawned-item {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .spawned-shape {
+    width: 40px;
+    height: 40px;
+    border: 3px solid white;
+  }
+
+  .spawned-text {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  @keyframes flyAcross {
+    0% { transform: translate(0, 0) rotate(0deg) scale(0.5); opacity: 1; }
+    100% { transform: translate(100vw, -100vh) rotate(360deg) scale(1.5); opacity: 0; }
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100vh) scale(2); opacity: 0; }
+  }
+
   /* Noise */
   .noise {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 40;
     pointer-events: none;
-    opacity: 0.06;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    animation: noiseShift 0.2s infinite;
-  }
-
-  @keyframes noiseShift {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-2%, 2%); }
-    50% { transform: translate(2%, -2%); }
-    75% { transform: translate(-2%, -2%); }
-    100% { transform: translate(2%, 2%); }
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
   /* Custom Cursor Trail */
@@ -284,19 +325,18 @@
   .ripple {
     position: absolute;
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 4px solid #fff;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 9997;
-    animation: rippleAnim 0.8s ease-out forwards;
+    animation: rippleAnim 0.6s ease-out forwards;
   }
 
   @keyframes rippleAnim {
-    0% { width: 0; height: 0; opacity: 1; }
-    100% { width: 400px; height: 400px; opacity: 0; }
+    0% { width: 0; height: 0; opacity: 1; border-width: 10px; }
+    100% { width: 600px; height: 600px; opacity: 0; border-width: 1px; }
   }
 
-  /* Mobil-Anpassungen */
   @media (pointer: coarse) {
     * { cursor: auto; }
     #cursor-canvas { display: none; }
@@ -306,10 +346,8 @@
 </head>
 <body>
 
-  <!-- 1. Hintergrund Canvas -->
+  <!-- Hintergrund -->
   <canvas id="particle-canvas"></canvas>
-
-  <!-- 2. Farbige Blobs & Raster -->
   <div class="blob-container">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -317,46 +355,38 @@
   </div>
   <div class="grid-overlay"></div>
 
-  <!-- 3. Endloser Text -->
-  <div class="marquee-wrapper">
-    <div class="marquee marquee-top">NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • </div>
-    <div class="marquee marquee-bottom">MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • </div>
-  </div>
-
-  <!-- 4. Hauptinhalt -->
+  <!-- Hauptinhalt -->
   <div class="wrapper" id="wrapper">
     
-    <!-- Rotierender Ring -->
-    <svg class="spinning-ring" viewBox="0 0 500 500">
-      <path id="circlePath" d="M 250, 250 m -200, 0 a 200,200 0 1,1 400,0 a 200,200 0 1,1 -400,0" fill="transparent" />
-      <text>
-        <textPath href="#circlePath" startOffset="0%">
-          DAS MACHT KEINEN SINN • DAS MACHT KEINEN SINN • DAS MACHT KEINEN SINN • 
-        </textPath>
-      </text>
-    </svg>
+    <!-- CSS Rotierender Ring -->
+    <div class="circle-container">
+      <div class="circle-text" id="circle-text"></div>
+    </div>
 
     <!-- Glitch Text -->
     <div class="glitch-container">
-      <h1 data-text="VIBES">VIBES</h1>
+      <h1 data-text="CHAOS">CHAOS</h1>
     </div>
-
-    <p class="subtitle">Nur ein Test</p>
   </div>
 
-  <!-- 5. Overlays -->
+  <!-- Fake Visualizer -->
+  <div class="visualizer" id="visualizer"></div>
+
+  <!-- Effekte -->
+  <div class="scanlines"></div>
+  <div class="screen-flicker"></div>
   <div class="noise"></div>
   <canvas id="cursor-canvas"></canvas>
 
   <script>
     // ==========================================
-    // 1. FARB-ZYKLUS (Ändert die Akzentfarben)
+    // 1. FARB-ZYKLUS (Extrem schnell & grell)
     // ==========================================
     const colors = [
-      ['#6c8cff', '#b06cff', '#ff6c9c'], // Blau/Lila/Pink
-      ['#00ffcc', '#00ccff', '#ff00ff'], // Neon Cyan/Magenta
-      ['#ff0055', '#ffaa00', '#00ff66'], // Rot/Gelb/Grün
-      ['#ff00ea', '#7000ff', '#00e5ff']  // Cyberpunk
+      ['#00ffcc', '#ff00ea', '#ffaa00'], // Neon
+      ['#ff0000', '#00ff00', '#0000ff'], // RGB
+      ['#ffffff', '#000000', '#ff0000'], // Kontrast
+      ['#ffff00', '#00ffff', '#ff00ff']  // CMYK
     ];
     let colorIndex = 0;
     const root = document.documentElement;
@@ -366,10 +396,32 @@
       root.style.setProperty('--accent-1', colors[colorIndex][0]);
       root.style.setProperty('--accent-2', colors[colorIndex][1]);
       root.style.setProperty('--accent-3', colors[colorIndex][2]);
-    }, 3000); // Alle 3 Sekunden wechseln
+      
+      // Zufällige Hintergrundfarbe für den absoluten Seizure-Effekt
+      if (Math.random() > 0.7) {
+        document.body.style.backgroundColor = colors[colorIndex][0];
+        setTimeout(() => document.body.style.backgroundColor = '#050505', 50);
+      }
+    }, 1500);
 
     // ==========================================
-    // 2. 3D TILT & MAUS TRACKING
+    // 2. CSS KREIS TEXT GENERATOR (Bugfrei)
+    // ==========================================
+    const circleText = document.getElementById('circle-text');
+    const text = "DAS MACHT KEINEN SINN • SYSTEM ERROR • ";
+    const chars = text.split("");
+    const angleStep = 360 / chars.length;
+
+    chars.forEach((char, i) => {
+      const span = document.createElement('span');
+      span.innerText = char;
+      // Jedes Zeichen wird um seinen Winkel gedreht
+      span.style.transform = `rotate(${i * angleStep}deg)`;
+      circleText.appendChild(span);
+    });
+
+    // ==========================================
+    // 3. 3D TILT
     // ==========================================
     const wrapper = document.getElementById('wrapper');
     let mouseX = window.innerWidth / 2;
@@ -378,15 +430,13 @@
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-
-      // 3D Tilt
-      const xAxis = (window.innerWidth / 2 - mouseX) / 20;
-      const yAxis = (window.innerHeight / 2 - mouseY) / 20;
+      const xAxis = (window.innerWidth / 2 - mouseX) / 15;
+      const yAxis = (window.innerHeight / 2 - mouseY) / 15;
       wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
     });
 
     // ==========================================
-    // 3. PARTIKEL NETZWERK (Hintergrund)
+    // 4. PARTIKEL NETZWERK
     // ==========================================
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
@@ -403,9 +453,9 @@
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 1.5;
-        this.vy = (Math.random() - 0.5) * 1.5;
-        this.radius = Math.random() * 2 + 1;
+        this.vx = (Math.random() - 0.5) * 3; // Schneller
+        this.vy = (Math.random() - 0.5) * 3;
+        this.radius = Math.random() * 3 + 1;
       }
       update() {
         this.x += this.vx;
@@ -416,12 +466,12 @@
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.fill();
       }
     }
 
-    for (let i = 0; i < 120; i++) particles.push(new Particle());
+    for (let i = 0; i < 150; i++) particles.push(new Particle());
 
     function animateParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -432,12 +482,12 @@
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 150) {
+          if (dist < 100) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist / 150})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist / 100})`;
+            ctx.lineWidth = 1;
             ctx.stroke();
           }
         }
@@ -447,7 +497,7 @@
     animateParticles();
 
     // ==========================================
-    // 4. CURSOR TRAIL (Maus-Spur)
+    // 5. CURSOR TRAIL
     // ==========================================
     const cursorCanvas = document.getElementById('cursor-canvas');
     const cCtx = cursorCanvas.getContext('2d');
@@ -461,7 +511,9 @@
     resizeCursorCanvas();
 
     window.addEventListener('mousemove', (e) => {
+      // Mehr Punkte für dickeren Trail
       trailPoints.push({ x: e.clientX, y: e.clientY, life: 1 });
+      trailPoints.push({ x: e.clientX + Math.random()*10, y: e.clientY + Math.random()*10, life: 1 });
     });
 
     function animateTrail() {
@@ -469,7 +521,7 @@
       
       for (let i = 0; i < trailPoints.length; i++) {
         const p = trailPoints[i];
-        p.life -= 0.02; // Wie schnell die Spur verschwindet
+        p.life -= 0.03;
         
         if (p.life <= 0) {
           trailPoints.splice(i, 1);
@@ -477,11 +529,10 @@
           continue;
         }
 
-        const size = 15 * p.life;
+        const size = 20 * p.life;
         cCtx.beginPath();
         cCtx.arc(p.x, p.y, size, 0, Math.PI * 2);
-        // Die Farbe ändert sich mit dem Leben des Punktes
-        cCtx.fillStyle = `rgba(255, 255, 255, ${p.life * 0.8})`;
+        cCtx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
         cCtx.fill();
       }
       requestAnimationFrame(animateTrail);
@@ -489,7 +540,7 @@
     animateTrail();
 
     // ==========================================
-    // 5. KLICK-RIPPLE EFFEKT
+    // 6. KLICK-RIPPLE
     // ==========================================
     document.addEventListener('click', (e) => {
       const ripple = document.createElement('div');
@@ -497,29 +548,76 @@
       ripple.style.left = e.clientX + 'px';
       ripple.style.top = e.clientY + 'px';
       document.body.appendChild(ripple);
-
-      // Nach der Animation wieder entfernen
-      setTimeout(() => {
-        ripple.remove();
-      }, 800);
+      setTimeout(() => ripple.remove(), 600);
     });
 
     // ==========================================
-    // 6. TEXT ZITTERN (Zufälliges Wackeln)
+    // 7. FAKE AUDIO VISUALIZER
+    // ==========================================
+    const visualizer = document.getElementById('visualizer');
+    const barCount = 40;
+    
+    for (let i = 0; i < barCount; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      visualizer.appendChild(bar);
+    }
+
+    const bars = document.querySelectorAll('.bar');
+
+    setInterval(() => {
+      bars.forEach(bar => {
+        // Zufällige Höhe (simuliert Musik)
+        const height = Math.random() * 100 + 10;
+        bar.style.height = `${height}px`;
+      });
+    }, 50); // Extrem schneller Beat
+
+    // ==========================================
+    // 8. SPAWNENDE FORMEN & TEXT-SPAM
+    // ==========================================
+    const spamTexts = ["CHAOS", "404", "ERROR", "SYSTEM", "FAIL", "NULL", "VIBES", "MAX"];
+    
+    setInterval(() => {
+      // Zufälliges Element erstellen
+      const el = document.createElement('div');
+      el.className = 'spawned-item';
+      
+      if (Math.random() > 0.5) {
+        // Form spawnen
+        el.classList.add('spawned-shape');
+        const shapes = ['50%', '0%', '50% 0%']; // Kreis, Quadrat, Dreieck
+        el.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+        el.style.animation = `flyAcross ${Math.random() * 2 + 1}s linear forwards`;
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = Math.random() * 100 + 'vh';
+      } else {
+        // Text spawnen
+        el.classList.add('spawned-text');
+        el.innerText = spamTexts[Math.floor(Math.random() * spamTexts.length)];
+        el.style.animation = `floatUp ${Math.random() * 2 + 1}s linear forwards`;
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '100vh';
+      }
+
+      document.body.appendChild(el);
+      
+      // Nach der Animation aufräumen
+      setTimeout(() => el.remove(), 3000);
+    }, 100); // 10x pro Sekunde wird etwas gespawnt!
+
+    // ==========================================
+    // 9. ZUFÄLLIGES ZITTERN DES TITELS
     // ==========================================
     const title = document.querySelector('h1');
     setInterval(() => {
-      // Zufällige Verschiebung für einen Sekundenbruchteil
-      if (Math.random() > 0.8) {
-        const x = (Math.random() - 0.5) * 10;
-        const y = (Math.random() - 0.5) * 10;
-        title.style.transform = `translate(${x}px, ${y}px)`;
-        
-        setTimeout(() => {
-          title.style.transform = 'translate(0, 0)';
-        }, 50);
-      }
-    }, 100);
+      const x = (Math.random() - 0.5) * 30;
+      const y = (Math.random() - 0.5) * 30;
+      title.style.transform = `translate(${x}px, ${y}px) skewX(${(Math.random()-0.5)*20}deg)`;
+      setTimeout(() => {
+        title.style.transform = 'translate(0, 0) skewX(0)';
+      }, 50);
+    }, 200);
   </script>
 </body>
 </html>
