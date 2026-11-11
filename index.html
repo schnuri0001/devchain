@@ -3,621 +3,345 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SYSTEM OVERLOAD</title>
+<title>AETHER — Pure Elegance</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&display=swap');
 
   :root {
-    --bg: #050505;
-    --text: #ffffff;
-    --accent-1: #00ffcc;
-    --accent-2: #ff00ea;
-    --accent-3: #ffaa00;
+    --bg: #03060a;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
   }
 
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    cursor: none;
+    cursor: none; /* Eigener Cursor */
   }
 
   body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', sans-serif;
     overflow: hidden;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    perspective: 1200px;
-    transition: background-color 0.1s ease; /* Sehr schneller Farbwechsel */
+    perspective: 1500px; /* Tiefe für 3D */
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 40%),
+      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 40%);
+    background-size: 200% 200%;
+    animation: bgBreath 15s infinite alternate ease-in-out;
+  }
+
+  @keyframes bgBreath {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
   }
 
   /* =========================================
-     1. HINTERGRUND EBENEN
+     STERNENFELD (Canvas)
      ========================================= */
-  
-  /* Partikel Netzwerk */
-  #particle-canvas {
+  #starfield {
     position: absolute;
     inset: 0;
     z-index: 0;
-    pointer-events: none;
-  }
-
-  /* Farbige Blobs */
-  .blob-container {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 1;
-    filter: blur(100px);
-    pointer-events: none;
-  }
-
-  .blob {
-    position: absolute;
-    width: 60vw;
-    height: 60vw;
-    opacity: 0.6;
-    animation: morph 6s infinite alternate ease-in-out, float 10s infinite alternate ease-in-out;
-    transition: background-color 0.5s ease;
-  }
-
-  .blob-1 { background: var(--accent-1); top: -20%; left: -10%; }
-  .blob-2 { background: var(--accent-2); bottom: -20%; right: -10%; animation-delay: -3s; }
-  .blob-3 { background: var(--accent-3); top: 20%; left: 30%; width: 50vw; height: 50vw; animation-delay: -5s; }
-
-  @keyframes morph {
-    0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-    50% { border-radius: 100% 0% 0% 100% / 100% 100% 0% 0%; }
-    100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-  }
-
-  @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(30vw, 30vh) scale(1.5); }
-  }
-
-  /* Warp Grid */
-  .grid-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-image: 
-      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-    animation: warpGrid 2s infinite linear;
-  }
-
-  @keyframes warpGrid {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.1) rotate(1deg); }
-    100% { transform: scale(1) rotate(0deg); }
   }
 
   /* =========================================
-     2. SCANLINES & FLICKER
+     GLAS-KARTE (Hauptinhalt)
      ========================================= */
-  .scanlines {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    pointer-events: none;
-    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.3));
-    background-size: 100% 4px;
-    animation: scanlineMove 10s linear infinite;
-  }
-
-  @keyframes scanlineMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100vh; }
-  }
-
-  .screen-flicker {
-    position: fixed;
-    inset: 0;
-    z-index: 49;
-    background: rgba(255, 255, 255, 0.05);
-    opacity: 0;
-    pointer-events: none;
-    animation: flicker 0.15s infinite;
-  }
-
-  @keyframes flicker {
-    0% { opacity: 0; }
-    10% { opacity: 1; }
-    20% { opacity: 0; }
-    30% { opacity: 0; }
-    40% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 0; }
-  }
-
-  /* =========================================
-     3. HAUPTINHALT & CSS KREIS
-     ========================================= */
-  .wrapper {
+  .glass-card {
     position: relative;
-    z-index: 2;
-    text-align: center;
-    pointer-events: none;
-    transform-style: preserve-3d;
-    transition: transform 0.05s ease-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    mix-blend-mode: exclusion;
-  }
-
-  /* Kreisender Text (CSS Version - Bugfrei) */
-  .circle-container {
-    position: absolute;
-    width: 700px;
-    height: 700px;
-    animation: spin 15s linear infinite;
-    z-index: -1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .circle-text {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    animation: spin 15s linear infinite;
-  }
-
-  .circle-text span {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 8px;
-    color: rgba(255, 255, 255, 0.4);
-    transform-origin: 0 350px; /* Radius des Kreises */
-    text-transform: uppercase;
-  }
-
-  @keyframes spin {
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Glitch Title */
-  .glitch-container {
-    position: relative;
-  }
-
-  h1 {
-    font-size: clamp(5rem, 18vw, 15rem);
-    line-height: 0.8;
-    text-transform: uppercase;
-    letter-spacing: -0.05em;
-    font-weight: 700;
-    position: relative;
-    text-shadow: 0 0 30px rgba(255,255,255,0.2);
-  }
-
-  /* Glitch Ebenen */
-  h1::before, h1::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: var(--bg);
-  }
-  
-  h1::before {
-    left: 5px;
-    text-shadow: -5px 0 cyan;
-    clip: rect(20px, 9999px, 80px, 0);
-    animation: glitch-anim-1 0.5s infinite linear alternate-reverse;
-  }
-
-  h1::after {
-    left: -5px;
-    text-shadow: 5px 0 magenta;
-    clip: rect(60px, 9999px, 120px, 0);
-    animation: glitch-anim-2 0.4s infinite linear alternate-reverse;
-  }
-
-  @keyframes glitch-anim-1 {
-    0% { clip: rect(20px, 9999px, 80px, 0); }
-    20% { clip: rect(60px, 9999px, 10px, 0); }
-    40% { clip: rect(10px, 9999px, 90px, 0); }
-    60% { clip: rect(80px, 9999px, 50px, 0); }
-    80% { clip: rect(40px, 9999px, 70px, 0); }
-    100% { clip: rect(90px, 9999px, 30px, 0); }
-  }
-
-  @keyframes glitch-anim-2 {
-    0% { clip: rect(70px, 9999px, 20px, 0); }
-    20% { clip: rect(30px, 9999px, 80px, 0); }
-    40% { clip: rect(90px, 9999px, 40px, 0); }
-    60% { clip: rect(10px, 9999px, 60px, 0); }
-    80% { clip: rect(50px, 9999px, 90px, 0); }
-    100% { clip: rect(20px, 9999px, 70px, 0); }
-  }
-
-  /* =========================================
-     4. AUDIO VISUALIZER & SPAWNING
-     ========================================= */
-  
-  /* Fake Visualizer */
-  .visualizer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 5px;
     z-index: 10;
-    pointer-events: none;
-    opacity: 0.6;
+    padding: 80px 100px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    text-align: center;
+    transform-style: preserve-3d;
+    box-shadow: 
+      0 30px 60px -20px rgba(0, 0, 0, 0.8),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.1s ease-out; /* Smooth follow */
   }
 
-  .bar {
-    width: 15px;
-    background: var(--text);
-    transition: height 0.05s ease;
-  }
-
-  /* Spawnende Formen & Text */
-  .spawned-item {
+  /* Sanfter Lichtreflex auf der Karte */
+  .glass-card::before {
+    content: "";
     position: absolute;
-    pointer-events: none;
-    z-index: 5;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .spawned-shape {
-    width: 40px;
-    height: 40px;
-    border: 3px solid white;
-  }
-
-  .spawned-text {
-    font-size: 2rem;
-    color: white;
-    text-shadow: 2px 2px 0 #000;
-  }
-
-  @keyframes flyAcross {
-    0% { transform: translate(0, 0) rotate(0deg) scale(0.5); opacity: 1; }
-    100% { transform: translate(100vw, -100vh) rotate(360deg) scale(1.5); opacity: 0; }
-  }
-
-  @keyframes floatUp {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-100vh) scale(2); opacity: 0; }
-  }
-
-  /* Noise */
-  .noise {
-    position: fixed;
     inset: 0;
-    z-index: 40;
-    pointer-events: none;
-    opacity: 0.08;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  }
-
-  /* Custom Cursor Trail */
-  #cursor-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
+    border-radius: 32px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%);
     pointer-events: none;
   }
 
-  /* Klick-Ripple */
-  .ripple {
+  /* =========================================
+     TYPOGRAFIE
+     ========================================= */
+  h1 {
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #ffffff 20%, #94a3b8 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transform: translateZ(50px); /* 3D Pop-Effekt */
+  }
+
+  p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    max-width: 400px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    transform: translateZ(30px);
+  }
+
+  /* =========================================
+     BUTTON
+     ========================================= */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 40px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(40px);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: auto; /* Klickbar machen */
+  }
+
+  /* Der leuchtende Gradient im Hintergrund des Buttons */
+  .btn::before {
+    content: "";
     position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #38bdf8, #a855f7);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+  }
+
+  .btn:hover {
+    transform: translateZ(40px) scale(1.05);
+    border-color: transparent;
+    box-shadow: 0 10px 40px -10px rgba(56, 189, 248, 0.5);
+  }
+
+  .btn:hover::before {
+    opacity: 1;
+  }
+
+  /* =========================================
+     CUSTOM CURSOR (Extrem Smooth)
+     ========================================= */
+  .cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: #fff;
     border-radius: 50%;
-    border: 4px solid #fff;
-    transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 9997;
-    animation: rippleAnim 0.6s ease-out forwards;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #fff;
   }
 
-  @keyframes rippleAnim {
-    0% { width: 0; height: 0; opacity: 1; border-width: 10px; }
-    100% { width: 600px; height: 600px; opacity: 0; border-width: 1px; }
+  .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 50px; height: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, border-color 0.3s;
   }
 
-  @media (pointer: coarse) {
+  /* Cursor-Effekt beim Hover über den Button */
+  .btn:hover ~ .cursor-ring,
+  body:has(.btn:hover) .cursor-ring {
+    width: 80px;
+    height: 80px;
+    border-color: rgba(168, 85, 247, 0.5);
+    background: rgba(168, 85, 247, 0.05);
+  }
+
+  /* Mobile Anpassungen */
+  @media (max-width: 768px) {
+    .glass-card { padding: 50px 30px; margin: 20px; }
     * { cursor: auto; }
-    #cursor-canvas { display: none; }
-    .wrapper { transform: none !important; }
+    .cursor-dot, .cursor-ring { display: none; }
+    .glass-card { transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-  <!-- Hintergrund -->
-  <canvas id="particle-canvas"></canvas>
-  <div class="blob-container">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-  </div>
-  <div class="grid-overlay"></div>
+  <!-- 3D Sternenfeld -->
+  <canvas id="starfield"></canvas>
 
-  <!-- Hauptinhalt -->
-  <div class="wrapper" id="wrapper">
-    
-    <!-- CSS Rotierender Ring -->
-    <div class="circle-container">
-      <div class="circle-text" id="circle-text"></div>
-    </div>
+  <!-- Hauptinhalt (Glas-Karte) -->
+  <main class="glass-card" id="card">
+    <h1>AETHER</h1>
+    <p>Die Kunst der digitalen Stille. Ein Ort, an dem Design atmet und Technologie unsichtbar wird.</p>
+    <a href="#" class="btn">Erkunden</a>
+  </main>
 
-    <!-- Glitch Text -->
-    <div class="glitch-container">
-      <h1 data-text="CHAOS">CHAOS</h1>
-    </div>
-  </div>
-
-  <!-- Fake Visualizer -->
-  <div class="visualizer" id="visualizer"></div>
-
-  <!-- Effekte -->
-  <div class="scanlines"></div>
-  <div class="screen-flicker"></div>
-  <div class="noise"></div>
-  <canvas id="cursor-canvas"></canvas>
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="dot"></div>
+  <div class="cursor-ring" id="ring"></div>
 
   <script>
     // ==========================================
-    // 1. FARB-ZYKLUS (Extrem schnell & grell)
+    // 1. SMOOTH CUSTOM CURSOR (Lerp Effekt)
     // ==========================================
-    const colors = [
-      ['#00ffcc', '#ff00ea', '#ffaa00'], // Neon
-      ['#ff0000', '#00ff00', '#0000ff'], // RGB
-      ['#ffffff', '#000000', '#ff0000'], // Kontrast
-      ['#ffff00', '#00ffff', '#ff00ff']  // CMYK
-    ];
-    let colorIndex = 0;
-    const root = document.documentElement;
-
-    setInterval(() => {
-      colorIndex = (colorIndex + 1) % colors.length;
-      root.style.setProperty('--accent-1', colors[colorIndex][0]);
-      root.style.setProperty('--accent-2', colors[colorIndex][1]);
-      root.style.setProperty('--accent-3', colors[colorIndex][2]);
-      
-      // Zufällige Hintergrundfarbe für den absoluten Seizure-Effekt
-      if (Math.random() > 0.7) {
-        document.body.style.backgroundColor = colors[colorIndex][0];
-        setTimeout(() => document.body.style.backgroundColor = '#050505', 50);
-      }
-    }, 1500);
-
-    // ==========================================
-    // 2. CSS KREIS TEXT GENERATOR (Bugfrei)
-    // ==========================================
-    const circleText = document.getElementById('circle-text');
-    const text = "DAS MACHT KEINEN SINN • SYSTEM ERROR • ";
-    const chars = text.split("");
-    const angleStep = 360 / chars.length;
-
-    chars.forEach((char, i) => {
-      const span = document.createElement('span');
-      span.innerText = char;
-      // Jedes Zeichen wird um seinen Winkel gedreht
-      span.style.transform = `rotate(${i * angleStep}deg)`;
-      circleText.appendChild(span);
-    });
-
-    // ==========================================
-    // 3. 3D TILT
-    // ==========================================
-    const wrapper = document.getElementById('wrapper');
+    const dot = document.getElementById('dot');
+    const ring = document.getElementById('ring');
+    
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
+    
+    let dotX = mouseX, dotY = mouseY;
+    let ringX = mouseX, ringY = mouseY;
 
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      const xAxis = (window.innerWidth / 2 - mouseX) / 15;
-      const yAxis = (window.innerHeight / 2 - mouseY) / 15;
-      wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
     });
 
-    // ==========================================
-    // 4. PARTIKEL NETZWERK
-    // ==========================================
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+    function animateCursor() {
+      // Der Punkt folgt sehr schnell (Lerp 0.5)
+      dotX += (mouseX - dotX) * 0.5;
+      dotY += (mouseY - dotY) * 0.5;
+      dot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Der Ring folgt träge und smooth (Lerp 0.1)
+      ringX += (mouseX - ringX) * 0.1;
+      ringY += (mouseY - ringY) * 0.1;
+      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+      requestAnimationFrame(animateCursor);
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 3; // Schneller
-        this.vy = (Math.random() - 0.5) * 3;
-        this.radius = Math.random() * 3 + 1;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < 150; i++) particles.push(new Particle());
-
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist / 100})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
+    animateCursor();
 
     // ==========================================
-    // 5. CURSOR TRAIL
+    // 2. 3D TILT DER GLAS-KARTE (Extrem Smooth)
     // ==========================================
-    const cursorCanvas = document.getElementById('cursor-canvas');
-    const cCtx = cursorCanvas.getContext('2d');
-    let trailPoints = [];
-
-    function resizeCursorCanvas() {
-      cursorCanvas.width = window.innerWidth;
-      cursorCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCursorCanvas);
-    resizeCursorCanvas();
+    const card = document.getElementById('card');
+    let targetRotateX = 0;
+    let targetRotateY = 0;
+    let currentRotateX = 0;
+    let currentRotateY = 0;
 
     window.addEventListener('mousemove', (e) => {
-      // Mehr Punkte für dickeren Trail
-      trailPoints.push({ x: e.clientX, y: e.clientY, life: 1 });
-      trailPoints.push({ x: e.clientX + Math.random()*10, y: e.clientY + Math.random()*10, life: 1 });
+      // Berechnung des Winkels basierend auf der Mausposition
+      const x = (window.innerWidth / 2 - e.clientX) / 40;
+      const y = (window.innerHeight / 2 - e.clientY) / 40;
+      
+      targetRotateX = y;
+      targetRotateY = x;
     });
 
-    function animateTrail() {
-      cCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+    function animateCard() {
+      // Lerp für butterweiche Bewegung
+      currentRotateX += (targetRotateX - currentRotateX) * 0.05;
+      currentRotateY += (targetRotateY - currentRotateY) * 0.05;
+
+      card.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`;
+
+      requestAnimationFrame(animateCard);
+    }
+    animateCard();
+
+    // ==========================================
+    // 3. 3D STERNENFELD (WebGL / Canvas 2D)
+    // ==========================================
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    });
+
+    const stars = [];
+    const numStars = 600;
+    const speed = 0.5; // Geschwindigkeit des Flugs
+
+    // Sterne initialisieren
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * width * 2,
+        y: (Math.random() - 0.5) * height * 2,
+        z: Math.random() * width,
+        color: Math.random() > 0.8 ? 'rgba(168, 85, 247, 0.8)' : 'rgba(255, 255, 255, 0.8)' // Ein paar lila Sterne
+      });
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
       
-      for (let i = 0; i < trailPoints.length; i++) {
-        const p = trailPoints[i];
-        p.life -= 0.03;
-        
-        if (p.life <= 0) {
-          trailPoints.splice(i, 1);
-          i--;
-          continue;
+      const cx = width / 2;
+      const cy = height / 2;
+
+      stars.forEach(star => {
+        // Der Stern bewegt sich auf uns zu (z wird kleiner)
+        star.z -= speed;
+
+        // Wenn der Stern vorbei ist, setzen wir ihn wieder nach hinten
+        if (star.z < 1) {
+          star.z = width;
+          star.x = (Math.random() - 0.5) * width * 2;
+          star.y = (Math.random() - 0.5) * height * 2;
         }
 
-        const size = 20 * p.life;
-        cCtx.beginPath();
-        cCtx.arc(p.x, p.y, size, 0, Math.PI * 2);
-        cCtx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
-        cCtx.fill();
-      }
-      requestAnimationFrame(animateTrail);
-    }
-    animateTrail();
+        // 3D Projektion auf 2D
+        const k = 128 / star.z; 
+        const px = star.x * k + cx;
+        const py = star.y * k + cy;
+        const size = (1 - star.z / width) * 2.5; // Sterne werden größer, wenn sie näher kommen
 
-    // ==========================================
-    // 6. KLICK-RIPPLE
-    // ==========================================
-    document.addEventListener('click', (e) => {
-      const ripple = document.createElement('div');
-      ripple.className = 'ripple';
-      ripple.style.left = e.clientX + 'px';
-      ripple.style.top = e.clientY + 'px';
-      document.body.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
-    });
-
-    // ==========================================
-    // 7. FAKE AUDIO VISUALIZER
-    // ==========================================
-    const visualizer = document.getElementById('visualizer');
-    const barCount = 40;
-    
-    for (let i = 0; i < barCount; i++) {
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      visualizer.appendChild(bar);
-    }
-
-    const bars = document.querySelectorAll('.bar');
-
-    setInterval(() => {
-      bars.forEach(bar => {
-        // Zufällige Höhe (simuliert Musik)
-        const height = Math.random() * 100 + 10;
-        bar.style.height = `${height}px`;
+        // Nur zeichnen, wenn der Stern auf dem Bildschirm ist
+        if (px >= 0 && px <= width && py >= 0 && py <= height) {
+          ctx.beginPath();
+          ctx.arc(px, py, size, 0, Math.PI * 2);
+          ctx.fillStyle = star.color;
+          ctx.fill();
+        }
       });
-    }, 50); // Extrem schneller Beat
 
-    // ==========================================
-    // 8. SPAWNENDE FORMEN & TEXT-SPAM
-    // ==========================================
-    const spamTexts = ["CHAOS", "404", "ERROR", "SYSTEM", "FAIL", "NULL", "VIBES", "MAX"];
-    
-    setInterval(() => {
-      // Zufälliges Element erstellen
-      const el = document.createElement('div');
-      el.className = 'spawned-item';
-      
-      if (Math.random() > 0.5) {
-        // Form spawnen
-        el.classList.add('spawned-shape');
-        const shapes = ['50%', '0%', '50% 0%']; // Kreis, Quadrat, Dreieck
-        el.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
-        el.style.animation = `flyAcross ${Math.random() * 2 + 1}s linear forwards`;
-        el.style.left = Math.random() * 100 + 'vw';
-        el.style.top = Math.random() * 100 + 'vh';
-      } else {
-        // Text spawnen
-        el.classList.add('spawned-text');
-        el.innerText = spamTexts[Math.floor(Math.random() * spamTexts.length)];
-        el.style.animation = `floatUp ${Math.random() * 2 + 1}s linear forwards`;
-        el.style.left = Math.random() * 100 + 'vw';
-        el.style.top = '100vh';
-      }
-
-      document.body.appendChild(el);
-      
-      // Nach der Animation aufräumen
-      setTimeout(() => el.remove(), 3000);
-    }, 100); // 10x pro Sekunde wird etwas gespawnt!
-
-    // ==========================================
-    // 9. ZUFÄLLIGES ZITTERN DES TITELS
-    // ==========================================
-    const title = document.querySelector('h1');
-    setInterval(() => {
-      const x = (Math.random() - 0.5) * 30;
-      const y = (Math.random() - 0.5) * 30;
-      title.style.transform = `translate(${x}px, ${y}px) skewX(${(Math.random()-0.5)*20}deg)`;
-      setTimeout(() => {
-        title.style.transform = 'translate(0, 0) skewX(0)';
-      }, 50);
-    }, 200);
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
   </script>
 </body>
 </html>
