@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AETHER — Pure Elegance</title>
+<title>AETHER</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&display=swap');
 
@@ -11,8 +11,8 @@
     --bg: #03060a;
     --text: #e2e8f0;
     --muted: #94a3b8;
-    --spotlight-x: 50%;
-    --spotlight-y: 50%;
+    --spot-x: 50%;
+    --spot-y: 50%;
   }
 
   * {
@@ -36,29 +36,22 @@
       radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.05), transparent 40%),
       radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.05), transparent 40%);
     background-size: 200% 200%;
-    animation: bgBreath 15s infinite alternate ease-in-out;
+    animation: breathe 15s infinite alternate ease-in-out;
   }
 
-  @keyframes bgBreath {
+  @keyframes breathe {
     0% { background-position: 0% 0%; }
     100% { background-position: 100% 100%; }
   }
 
-  /* =========================================
-     STERNENFELD (Canvas)
-     ========================================= */
-  #starfield {
+  #stars {
     position: absolute;
     inset: 0;
     z-index: 0;
-    /* Parallax wird per JS gesteuert */
-    transition: transform 0.2s ease-out; 
+    transition: transform 0.2s ease-out;
   }
 
-  /* =========================================
-     GLAS-KARTE (Hauptinhalt)
-     ========================================= */
-  .glass-card {
+  .card {
     position: relative;
     z-index: 10;
     padding: 80px 100px;
@@ -72,62 +65,46 @@
     box-shadow: 
       0 30px 60px -20px rgba(0, 0, 0, 0.8),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    
-    /* Animation beim Laden */
     opacity: 0;
     transform: translateY(30px) rotateX(10deg);
-    animation: cardAppear 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: show 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     animation-delay: 0.2s;
   }
 
-  @keyframes cardAppear {
+  @keyframes show {
     to {
       opacity: 1;
       transform: translateY(0) rotateX(0deg);
     }
   }
 
-  /* Der Spotlight-Effekt auf der Karte */
-  .glass-card::before {
+  .card::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 32px;
     background: radial-gradient(
-      circle at var(--spotlight-x) var(--spotlight-y),
+      circle at var(--spot-x) var(--spot-y),
       rgba(255, 255, 255, 0.08) 0%,
       transparent 50%
     );
     pointer-events: none;
     z-index: -1;
-    transition: background 0.1s ease;
   }
 
-  /* =========================================
-     TYPOGRAFIE (Mit Shimmer-Effekt)
-     ========================================= */
   h1 {
     font-size: clamp(3.5rem, 8vw, 6.5rem);
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: -0.03em;
     margin-bottom: 24px;
-    
-    /* Shimmer Gradient */
-    background: linear-gradient(
-      120deg, 
-      #ffffff 20%, 
-      #94a3b8 40%, 
-      #ffffff 60%, 
-      #94a3b8 80%
-    );
+    background: linear-gradient(120deg, #ffffff 20%, #94a3b8 40%, #ffffff 60%, #94a3b8 80%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     animation: shine 6s linear infinite;
-    
-    transform: translateZ(50px); /* 3D Pop */
+    transform: translateZ(50px);
   }
 
   @keyframes shine {
@@ -143,15 +120,15 @@
     margin: 0 auto 48px;
     line-height: 1.6;
     transform: translateZ(30px);
-    
     opacity: 0;
-    animation: fadeIn 1s ease forwards;
+    animation: fade 1s ease forwards;
     animation-delay: 0.8s;
   }
 
-  /* =========================================
-     MAGNETISCHER BUTTON
-     ========================================= */
+  @keyframes fade {
+    to { opacity: 1; }
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -168,17 +145,10 @@
     position: relative;
     overflow: hidden;
     transform: translateZ(40px);
-    
-    /* Magnetisches Verhalten */
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-    
     opacity: 0;
-    animation: fadeIn 1s ease forwards;
+    animation: fade 1s ease forwards;
     animation-delay: 1.2s;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
   }
 
   .btn::before {
@@ -200,10 +170,7 @@
     opacity: 1;
   }
 
-  /* =========================================
-     CUSTOM CURSOR & FILMKORN
-     ========================================= */
-  .cursor-dot {
+  .dot {
     position: fixed;
     top: 0; left: 0;
     width: 6px; height: 6px;
@@ -215,7 +182,7 @@
     box-shadow: 0 0 10px #fff;
   }
 
-  .cursor-ring {
+  .ring {
     position: fixed;
     top: 0; left: 0;
     width: 50px; height: 50px;
@@ -227,26 +194,24 @@
     transition: width 0.3s, height 0.3s, border-color 0.3s;
   }
 
-  .btn:hover ~ .cursor-ring,
-  body:has(.btn:hover) .cursor-ring {
+  body:has(.btn:hover) .ring {
     width: 80px;
     height: 80px;
     border-color: rgba(168, 85, 247, 0.5);
     background: rgba(168, 85, 247, 0.05);
   }
 
-  /* Filmkorn */
-  .noise {
+  .grain {
     position: fixed;
     inset: 0;
     z-index: 9997;
     pointer-events: none;
     opacity: 0.04;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    animation: noiseShift 0.2s infinite;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.2s infinite;
   }
 
-  @keyframes noiseShift {
+  @keyframes grain {
     0% { transform: translate(0, 0); }
     25% { transform: translate(-1%, 1%); }
     50% { transform: translate(1%, -1%); }
@@ -254,195 +219,143 @@
     100% { transform: translate(1%, 1%); }
   }
 
-  /* Mobile Anpassungen */
   @media (max-width: 768px) {
-    .glass-card { padding: 50px 30px; margin: 20px; }
+    .card { padding: 50px 30px; margin: 20px; }
     * { cursor: auto; }
-    .cursor-dot, .cursor-ring, .noise { display: none; }
-    .glass-card { transform: none !important; }
+    .dot, .ring, .grain { display: none; }
+    .card { transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-  <!-- 3D Sternenfeld -->
-  <canvas id="starfield"></canvas>
+  <canvas id="stars"></canvas>
 
-  <!-- Hauptinhalt -->
-  <main class="glass-card" id="card">
+  <main class="card" id="card">
     <h1>AETHER</h1>
     <p>Die Kunst der digitalen Stille. Ein Ort, an dem Design atmet und Technologie unsichtbar wird.</p>
-    <a href="#" class="btn" id="magnetic-btn">Erkunden</a>
+    <a href="/explore" class="btn" id="magnet">Erkunden</a>
   </main>
 
-  <!-- Effekte -->
-  <div class="noise"></div>
-  <div class="cursor-dot" id="dot"></div>
-  <div class="cursor-ring" id="ring"></div>
+  <div class="grain"></div>
+  <div class="dot" id="dot"></div>
+  <div class="ring" id="ring"></div>
 
   <script>
-    // ==========================================
-    // 1. SMOOTH CUSTOM CURSOR
-    // ==========================================
     const dot = document.getElementById('dot');
     const ring = document.getElementById('ring');
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let dotX = mouseX, dotY = mouseY;
-    let ringX = mouseX, ringY = mouseY;
+    let mx = window.innerWidth / 2;
+    let my = window.innerHeight / 2;
+    let dx = mx, dy = my;
+    let rx = mx, ry = my;
 
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+    window.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
     });
 
-    function animateCursor() {
-      dotX += (mouseX - dotX) * 0.5;
-      dotY += (mouseY - dotY) * 0.5;
-      dot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
+    (function tick() {
+      dx += (mx - dx) * 0.5;
+      dy += (my - dy) * 0.5;
+      dot.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
 
-      ringX += (mouseX - ringX) * 0.1;
-      ringY += (mouseY - ringY) * 0.1;
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+      rx += (mx - rx) * 0.1;
+      ry += (my - ry) * 0.1;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
 
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+      requestAnimationFrame(tick);
+    })();
 
-    // ==========================================
-    // 2. 3D TILT & SPOTLIGHT EFFEKT
-    // ==========================================
     const card = document.getElementById('card');
-    let targetRotateX = 0;
-    let targetRotateY = 0;
-    let currentRotateX = 0;
-    let currentRotateY = 0;
+    let tx = 0, ty = 0, cx = 0, cy = 0;
 
-    window.addEventListener('mousemove', (e) => {
-      // 3D Tilt berechnen
-      const x = (window.innerWidth / 2 - e.clientX) / 40;
-      const y = (window.innerHeight / 2 - e.clientY) / 40;
-      targetRotateX = y;
-      targetRotateY = x;
+    window.addEventListener('mousemove', e => {
+      tx = (window.innerHeight / 2 - e.clientY) / 40;
+      ty = (window.innerWidth / 2 - e.clientX) / 40;
 
-      // Spotlight-Position auf der Karte berechnen
-      const rect = card.getBoundingClientRect();
-      const cardX = e.clientX - rect.left;
-      const cardY = e.clientY - rect.top;
-      
-      card.style.setProperty('--spotlight-x', `${cardX}px`);
-      card.style.setProperty('--spotlight-y', `${cardY}px`);
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--spot-x', `${e.clientX - r.left}px`);
+      card.style.setProperty('--spot-y', `${e.clientY - r.top}px`);
     });
 
-    function animateCard() {
-      currentRotateX += (targetRotateX - currentRotateX) * 0.05;
-      currentRotateY += (targetRotateY - currentRotateY) * 0.05;
-      card.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`;
-      requestAnimationFrame(animateCard);
-    }
-    animateCard();
+    (function tilt() {
+      cx += (tx - cx) * 0.05;
+      cy += (ty - cy) * 0.05;
+      card.style.transform = `rotateX(${cx}deg) rotateY(${cy}deg)`;
+      requestAnimationFrame(tilt);
+    })();
 
-    // ==========================================
-    // 3. MAGNETISCHER BUTTON
-    // ==========================================
-    const btn = document.getElementById('magnetic-btn');
-    
-    btn.addEventListener('mousemove', (e) => {
-      const rect = btn.getBoundingClientRect();
-      // Mittelpunkt des Buttons
-      const btnCenterX = rect.left + rect.width / 2;
-      const btnCenterY = rect.top + rect.height / 2;
-      
-      // Abstand der Maus zum Mittelpunkt
-      const distanceX = e.clientX - btnCenterX;
-      const distanceY = e.clientY - btnCenterY;
-      
-      // Den Button in Richtung der Maus ziehen (maximal 15px)
-      btn.style.transform = `translateZ(40px) translate(${distanceX * 0.3}px, ${distanceY * 0.3}px) scale(1.05)`;
+    const magnet = document.getElementById('magnet');
+
+    magnet.addEventListener('mousemove', e => {
+      const r = magnet.getBoundingClientRect();
+      const ox = e.clientX - (r.left + r.width / 2);
+      const oy = e.clientY - (r.top + r.height / 2);
+      magnet.style.transform = `translateZ(40px) translate(${ox * 0.3}px, ${oy * 0.3}px) scale(1.05)`;
     });
 
-    btn.addEventListener('mouseleave', () => {
-      // Zurückschnappen lassen
-      btn.style.transform = `translateZ(40px) translate(0px, 0px) scale(1)`;
+    magnet.addEventListener('mouseleave', () => {
+      magnet.style.transform = `translateZ(40px) translate(0, 0) scale(1)`;
     });
 
-    // ==========================================
-    // 4. PARALLAX STERNENFELD
-    // ==========================================
-    const canvas = document.getElementById('starfield');
+    const canvas = document.getElementById('stars');
     const ctx = canvas.getContext('2d');
-    const starfieldElement = document.getElementById('starfield');
-    
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
 
     window.addEventListener('resize', () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
     });
 
-    const stars = [];
-    const numStars = 600;
-    const speed = 0.5;
-    let parallaxX = 0;
-    let parallaxY = 0;
-
-    // Sterne init
-    for (let i = 0; i < numStars; i++) {
-      stars.push({
-        x: (Math.random() - 0.5) * width * 2,
-        y: (Math.random() - 0.5) * height * 2,
-        z: Math.random() * width,
-        color: Math.random() > 0.8 ? 'rgba(168, 85, 247, 0.8)' : 'rgba(255, 255, 255, 0.8)'
+    const list = [];
+    for (let i = 0; i < 600; i++) {
+      list.push({
+        x: (Math.random() - 0.5) * w * 2,
+        y: (Math.random() - 0.5) * h * 2,
+        z: Math.random() * w,
+        c: Math.random() > 0.8 ? 'rgba(168, 85, 247, 0.8)' : 'rgba(255, 255, 255, 0.8)'
       });
     }
 
-    // Mausbewegung für Parallax tracken
-    window.addEventListener('mousemove', (e) => {
-      // Berechne den Parallax-Offset (maximal 20px)
-      parallaxX = (e.clientX / window.innerWidth - 0.5) * 20;
-      parallaxY = (e.clientY / window.innerHeight - 0.5) * 20;
-      
-      // Das gesamte Canvas leicht verschieben
-      starfieldElement.style.transform = `translate(${parallaxX * -1}px, ${parallaxY * -1}px)`;
+    let px = 0, py = 0;
+
+    window.addEventListener('mousemove', e => {
+      px = (e.clientX / window.innerWidth - 0.5) * 20;
+      py = (e.clientY / window.innerHeight - 0.5) * 20;
+      canvas.style.transform = `translate(${-px}px, ${-py}px)`;
     });
 
-    function drawStars() {
-      ctx.clearRect(0, 0, width, height);
-      
-      // Die Sterne verschieben sich im 3D-Raum leicht mit der Maus
-      const cx = width / 2 - parallaxX * 2;
-      const cy = height / 2 - parallaxY * 2;
+    (function loop() {
+      ctx.clearRect(0, 0, w, h);
+      const cx2 = w / 2 - px * 2;
+      const cy2 = h / 2 - py * 2;
 
-      stars.forEach(star => {
-        star.z -= speed;
-
-        if (star.z < 1) {
-          star.z = width;
-          star.x = (Math.random() - 0.5) * width * 2;
-          star.y = (Math.random() - 0.5) * height * 2;
+      for (const s of list) {
+        s.z -= 0.5;
+        if (s.z < 1) {
+          s.z = w;
+          s.x = (Math.random() - 0.5) * w * 2;
+          s.y = (Math.random() - 0.5) * h * 2;
         }
+        const k = 128 / s.z;
+        const sx = s.x * k + cx2;
+        const sy = s.y * k + cy2;
+        const size = (1 - s.z / w) * 2.5;
 
-        const k = 128 / star.z; 
-        const px = star.x * k + cx;
-        const py = star.y * k + cy;
-        const size = (1 - star.z / width) * 2.5;
-
-        if (px >= 0 && px <= width && py >= 0 && py <= height) {
+        if (sx >= 0 && sx <= w && sy >= 0 && sy <= h) {
           ctx.beginPath();
-          ctx.arc(px, py, size, 0, Math.PI * 2);
-          ctx.fillStyle = star.color;
+          ctx.arc(sx, sy, size, 0, Math.PI * 2);
+          ctx.fillStyle = s.c;
           ctx.fill();
         }
-      });
-
-      requestAnimationFrame(drawStars);
-    }
-    drawStars();
+      }
+      requestAnimationFrame(loop);
+    })();
   </script>
 </body>
 </html>
