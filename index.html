@@ -3,20 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MAXIMUM VIBES</title>
+<title>ABSOLUTE CHAOS</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
 
   :root {
     --bg: #050505;
     --text: #ffffff;
+    --accent-1: #6c8cff;
+    --accent-2: #b06cff;
+    --accent-3: #ff6c9c;
   }
 
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    cursor: none; /* Standard-Cursor aus */
+    cursor: none;
   }
 
   body {
@@ -28,58 +31,44 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    perspective: 1000px; /* Für den 3D-Effekt */
+    perspective: 1200px;
+    transition: background-color 0.5s ease;
   }
 
-  /* ---------- Canvas Partikel ---------- */
+  /* =========================================
+     1. HINTERGRUND EBENEN
+     ========================================= */
+  
+  /* Partikel Netzwerk */
   #particle-canvas {
     position: absolute;
     inset: 0;
     z-index: 0;
-    pointer-events: none; /* Maus durchlassen */
+    pointer-events: none;
   }
 
-  /* ---------- Morphing Blobs ---------- */
+  /* Farbige Blobs */
   .blob-container {
     position: absolute;
     inset: 0;
     overflow: hidden;
     z-index: 1;
-    filter: blur(90px);
+    filter: blur(100px);
     pointer-events: none;
-    transition: transform 0.2s ease-out;
   }
 
   .blob {
     position: absolute;
-    width: 45vw;
-    height: 45vw;
-    opacity: 0.6;
-    animation: morph 8s infinite alternate ease-in-out, float 12s infinite alternate ease-in-out;
+    width: 50vw;
+    height: 50vw;
+    opacity: 0.5;
+    animation: morph 10s infinite alternate ease-in-out, float 15s infinite alternate ease-in-out;
+    transition: background-color 1s ease;
   }
 
-  .blob-1 {
-    background: #6c8cff;
-    top: -10%;
-    left: -10%;
-  }
-
-  .blob-2 {
-    background: #b06cff;
-    bottom: -10%;
-    right: -10%;
-    animation-delay: -3s;
-  }
-
-  .blob-3 {
-    background: #ff6c9c;
-    top: 30%;
-    left: 40%;
-    width: 35vw;
-    height: 35vw;
-    animation-duration: 10s;
-    animation-delay: -6s;
-  }
+  .blob-1 { background: var(--accent-1); top: -10%; left: -10%; }
+  .blob-2 { background: var(--accent-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+  .blob-3 { background: var(--accent-3); top: 30%; left: 40%; width: 40vw; height: 40vw; animation-delay: -8s; }
 
   @keyframes morph {
     0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
@@ -90,10 +79,70 @@
 
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(15vw, 15vh) scale(1.1); }
+    100% { transform: translate(20vw, 20vh) scale(1.2); }
   }
 
-  /* ---------- 3D Wrapper für den Text ---------- */
+  /* Pulsierendes Raster */
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    animation: pulseGrid 4s infinite alternate;
+  }
+
+  @keyframes pulseGrid {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* =========================================
+     2. MARQUEE (Endlos-Text im Hintergrund)
+     ========================================= */
+  .marquee-wrapper {
+    position: absolute;
+    width: 200vw;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 10vh 0;
+    overflow: hidden;
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+  }
+
+  .marquee {
+    white-space: nowrap;
+    font-size: 8vw;
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 2px #fff;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .marquee-top { animation: scrollLeft 15s linear infinite; }
+  .marquee-bottom { animation: scrollRight 18s linear infinite; }
+
+  @keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes scrollRight {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* =========================================
+     3. HAUPTINHALT
+     ========================================= */
   .wrapper {
     position: relative;
     z-index: 2;
@@ -102,6 +151,37 @@
     pointer-events: none;
     transform-style: preserve-3d;
     transition: transform 0.1s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Der rotierende Text-Ring */
+  .spinning-ring {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    animation: spin 20s linear infinite;
+    z-index: -1;
+  }
+  
+  .spinning-ring text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    letter-spacing: 8px;
+    fill: var(--text);
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Glitch Title */
+  .glitch-container {
+    position: relative;
   }
 
   h1 {
@@ -110,80 +190,188 @@
     text-transform: uppercase;
     letter-spacing: -0.05em;
     font-weight: 700;
+    position: relative;
     text-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  /* Glitch Ebenen */
+  h1::before, h1::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--bg);
+  }
+  
+  h1::before {
+    left: 3px;
+    text-shadow: -3px 0 red;
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+  }
+
+  h1::after {
+    left: -3px;
+    text-shadow: -3px 0 blue;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  }
+
+  @keyframes glitch-anim-1 {
+    0% { clip: rect(20px, 9999px, 80px, 0); }
+    20% { clip: rect(60px, 9999px, 10px, 0); }
+    40% { clip: rect(10px, 9999px, 90px, 0); }
+    60% { clip: rect(80px, 9999px, 50px, 0); }
+    80% { clip: rect(40px, 9999px, 70px, 0); }
+    100% { clip: rect(90px, 9999px, 30px, 0); }
+  }
+
+  @keyframes glitch-anim-2 {
+    0% { clip: rect(70px, 9999px, 20px, 0); }
+    20% { clip: rect(30px, 9999px, 80px, 0); }
+    40% { clip: rect(90px, 9999px, 40px, 0); }
+    60% { clip: rect(10px, 9999px, 60px, 0); }
+    80% { clip: rect(50px, 9999px, 90px, 0); }
+    100% { clip: rect(20px, 9999px, 70px, 0); }
   }
 
   .subtitle {
     font-size: clamp(0.8rem, 2vw, 1.2rem);
-    margin-top: 30px;
+    margin-top: 40px;
     opacity: 0.8;
     letter-spacing: 0.5em;
     text-transform: uppercase;
+    animation: pulseText 2s infinite alternate;
   }
 
-  /* ---------- Noise Overlay ---------- */
+  @keyframes pulseText {
+    0% { opacity: 0.3; letter-spacing: 0.5em; }
+    100% { opacity: 1; letter-spacing: 0.6em; }
+  }
+
+  /* =========================================
+     4. EFFEKTE & OVERLAYS
+     ========================================= */
+  
+  /* Noise */
   .noise {
     position: fixed;
     inset: 0;
     z-index: 10;
     pointer-events: none;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: noiseShift 0.2s infinite;
   }
 
-  /* ---------- Custom Cursor ---------- */
-  .cursor {
+  @keyframes noiseShift {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 2%); }
+    50% { transform: translate(2%, -2%); }
+    75% { transform: translate(-2%, -2%); }
+    100% { transform: translate(2%, 2%); }
+  }
+
+  /* Custom Cursor Trail */
+  #cursor-canvas {
     position: fixed;
-    top: 0; left: 0;
-    width: 20px; height: 20px;
-    background: white;
-    border-radius: 50%;
+    inset: 0;
+    z-index: 9998;
     pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: difference;
-    transform: translate(-50%, -50%);
   }
 
-  /* Auf Mobilgeräten deaktivieren */
+  /* Klick-Ripple */
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9997;
+    animation: rippleAnim 0.8s ease-out forwards;
+  }
+
+  @keyframes rippleAnim {
+    0% { width: 0; height: 0; opacity: 1; }
+    100% { width: 400px; height: 400px; opacity: 0; }
+  }
+
+  /* Mobil-Anpassungen */
   @media (pointer: coarse) {
     * { cursor: auto; }
-    .cursor { display: none; }
+    #cursor-canvas { display: none; }
     .wrapper { transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-  <!-- Partikel-Hintergrund -->
+  <!-- 1. Hintergrund Canvas -->
   <canvas id="particle-canvas"></canvas>
 
-  <!-- Farbige Blobs -->
-  <div class="blob-container" id="blobContainer">
+  <!-- 2. Farbige Blobs & Raster -->
+  <div class="blob-container">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
+  <div class="grid-overlay"></div>
 
-  <!-- Hauptinhalt -->
-  <div class="wrapper" id="wrapper">
-    <h1 id="scramble-text">JUST<br>VIBES</h1>
-    <p class="subtitle">MAXIMUM OVERDRIVE</p>
+  <!-- 3. Endloser Text -->
+  <div class="marquee-wrapper">
+    <div class="marquee marquee-top">NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • NO PURPOSE • JUST CODE • </div>
+    <div class="marquee marquee-bottom">MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • MAXIMUM OVERDRIVE • </div>
   </div>
 
-  <!-- Filmkorn -->
-  <div class="noise"></div>
+  <!-- 4. Hauptinhalt -->
+  <div class="wrapper" id="wrapper">
+    
+    <!-- Rotierender Ring -->
+    <svg class="spinning-ring" viewBox="0 0 500 500">
+      <path id="circlePath" d="M 250, 250 m -200, 0 a 200,200 0 1,1 400,0 a 200,200 0 1,1 -400,0" fill="transparent" />
+      <text>
+        <textPath href="#circlePath" startOffset="0%">
+          DAS MACHT KEINEN SINN • DAS MACHT KEINEN SINN • DAS MACHT KEINEN SINN • 
+        </textPath>
+      </text>
+    </svg>
 
-  <!-- Mauszeiger -->
-  <div class="cursor" id="cursor"></div>
+    <!-- Glitch Text -->
+    <div class="glitch-container">
+      <h1 data-text="VIBES">VIBES</h1>
+    </div>
+
+    <p class="subtitle">Nur ein Test</p>
+  </div>
+
+  <!-- 5. Overlays -->
+  <div class="noise"></div>
+  <canvas id="cursor-canvas"></canvas>
 
   <script>
     // ==========================================
-    // 1. CUSTOM CURSOR & 3D TILT
+    // 1. FARB-ZYKLUS (Ändert die Akzentfarben)
     // ==========================================
-    const cursor = document.getElementById('cursor');
+    const colors = [
+      ['#6c8cff', '#b06cff', '#ff6c9c'], // Blau/Lila/Pink
+      ['#00ffcc', '#00ccff', '#ff00ff'], // Neon Cyan/Magenta
+      ['#ff0055', '#ffaa00', '#00ff66'], // Rot/Gelb/Grün
+      ['#ff00ea', '#7000ff', '#00e5ff']  // Cyberpunk
+    ];
+    let colorIndex = 0;
+    const root = document.documentElement;
+
+    setInterval(() => {
+      colorIndex = (colorIndex + 1) % colors.length;
+      root.style.setProperty('--accent-1', colors[colorIndex][0]);
+      root.style.setProperty('--accent-2', colors[colorIndex][1]);
+      root.style.setProperty('--accent-3', colors[colorIndex][2]);
+    }, 3000); // Alle 3 Sekunden wechseln
+
+    // ==========================================
+    // 2. 3D TILT & MAUS TRACKING
+    // ==========================================
     const wrapper = document.getElementById('wrapper');
-    const blobContainer = document.getElementById('blobContainer');
-    
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
@@ -191,27 +379,19 @@
       mouseX = e.clientX;
       mouseY = e.clientY;
 
-      // Cursor Bewegen
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-
-      // 3D Tilt für den Text berechnen
-      const xAxis = (window.innerWidth / 2 - mouseX) / 25;
-      const yAxis = (window.innerHeight / 2 - mouseY) / 25;
+      // 3D Tilt
+      const xAxis = (window.innerWidth / 2 - mouseX) / 20;
+      const yAxis = (window.innerHeight / 2 - mouseY) / 20;
       wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-
-      // Blobs leicht in die entgegengesetzte Richtung bewegen
-      blobContainer.style.transform = `translate(${xAxis * 2}px, ${yAxis * 2}px)`;
     });
 
     // ==========================================
-    // 2. PARTIKEL CANVAS (Netzwerk-Effekt)
+    // 3. PARTIKEL NETZWERK (Hintergrund)
     // ==========================================
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
 
-    // Canvas auf volle Größe bringen
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -219,68 +399,45 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Partikel-Klasse
     class Particle {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
         this.radius = Math.random() * 2 + 1;
       }
       update() {
         this.x += this.vx;
         this.y += this.vy;
-        // An den Rändern abprallen
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-        // Maus-Interaktion (Partikel weichen der Maus aus)
-        const dx = mouseX - this.x;
-        const dy = mouseY - this.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 150) {
-          const angle = Math.atan2(dy, dx);
-          this.x -= Math.cos(angle) * 2;
-          this.y -= Math.sin(angle) * 2;
-        }
       }
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.fill();
       }
     }
 
-    // Partikel initialisieren
-    for (let i = 0; i < 100; i++) {
-      particles.push(new Particle());
-    }
+    for (let i = 0; i < 120; i++) particles.push(new Particle());
 
-    // Animation Loop
     function animateParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
       
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-
-      // Verbindungen zwischen nahen Partikeln zeichnen
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx*dx + dy*dy);
-
-          if (dist < 120) {
+          if (dist < 150) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            // Verbindungslinien werden transparenter, je weiter sie auseinander sind
-            ctx.strokeStyle = `rgba(108, 140, 255, ${1 - dist / 120})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist / 150})`;
+            ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
@@ -290,39 +447,79 @@
     animateParticles();
 
     // ==========================================
-    // 3. TEXT SCRAMBLE EFFECT (Matrix-Style)
+    // 4. CURSOR TRAIL (Maus-Spur)
     // ==========================================
-    const letters = "!<>-_\\/[]{}—=+*^?#________";
-    const textElement = document.getElementById('scramble-text');
-    
-    // Den Text bei jedem Aufruf neu "zerstören"
-    function scrambleText() {
-      let iterations = 0;
-      const targetText = "JUST\nVIBES";
-      
-      const interval = setInterval(() => {
-        textElement.innerText = targetText
-          .split("")
-          .map((letter, index) => {
-            if (index < iterations || letter === "\n") {
-              return targetText[index];
-            }
-            return letters[Math.floor(Math.random() * letters.length)];
-          })
-          .join("");
+    const cursorCanvas = document.getElementById('cursor-canvas');
+    const cCtx = cursorCanvas.getContext('2d');
+    let trailPoints = [];
 
-        if (iterations >= targetText.length) {
-          clearInterval(interval);
-          // Nach einer Pause wieder von vorne beginnen
-          setTimeout(scrambleText, 4000); 
-        }
-        
-        iterations += 1 / 3; // Geschwindigkeit des Auflösens
-      }, 30);
+    function resizeCursorCanvas() {
+      cursorCanvas.width = window.innerWidth;
+      cursorCanvas.height = window.innerHeight;
     }
+    window.addEventListener('resize', resizeCursorCanvas);
+    resizeCursorCanvas();
 
-    // Effekt kurz nach dem Laden starten
-    setTimeout(scrambleText, 1000);
+    window.addEventListener('mousemove', (e) => {
+      trailPoints.push({ x: e.clientX, y: e.clientY, life: 1 });
+    });
+
+    function animateTrail() {
+      cCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+      
+      for (let i = 0; i < trailPoints.length; i++) {
+        const p = trailPoints[i];
+        p.life -= 0.02; // Wie schnell die Spur verschwindet
+        
+        if (p.life <= 0) {
+          trailPoints.splice(i, 1);
+          i--;
+          continue;
+        }
+
+        const size = 15 * p.life;
+        cCtx.beginPath();
+        cCtx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        // Die Farbe ändert sich mit dem Leben des Punktes
+        cCtx.fillStyle = `rgba(255, 255, 255, ${p.life * 0.8})`;
+        cCtx.fill();
+      }
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+
+    // ==========================================
+    // 5. KLICK-RIPPLE EFFEKT
+    // ==========================================
+    document.addEventListener('click', (e) => {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      ripple.style.left = e.clientX + 'px';
+      ripple.style.top = e.clientY + 'px';
+      document.body.appendChild(ripple);
+
+      // Nach der Animation wieder entfernen
+      setTimeout(() => {
+        ripple.remove();
+      }, 800);
+    });
+
+    // ==========================================
+    // 6. TEXT ZITTERN (Zufälliges Wackeln)
+    // ==========================================
+    const title = document.querySelector('h1');
+    setInterval(() => {
+      // Zufällige Verschiebung für einen Sekundenbruchteil
+      if (Math.random() > 0.8) {
+        const x = (Math.random() - 0.5) * 10;
+        const y = (Math.random() - 0.5) * 10;
+        title.style.transform = `translate(${x}px, ${y}px)`;
+        
+        setTimeout(() => {
+          title.style.transform = 'translate(0, 0)';
+        }, 50);
+      }
+    }, 100);
   </script>
 </body>
 </html>
