@@ -3,195 +3,326 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Just Vibes</title>
+<title>MAXIMUM VIBES</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
 
   :root {
     --bg: #050505;
     --text: #ffffff;
-    --accent: #ff0055;
   }
 
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    cursor: none; /* Versteckt den Standard-Mauszeiger */
+    cursor: none; /* Standard-Cursor aus */
   }
 
   body {
     background-color: var(--bg);
     color: var(--text);
     font-family: 'Space Grotesk', sans-serif;
-    overflow: hidden; /* Verhindert Scrollen */
+    overflow: hidden;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    perspective: 1000px; /* Für den 3D-Effekt */
   }
 
-  /* ---------- Hintergrund Blobs ---------- */
-  .background {
+  /* ---------- Canvas Partikel ---------- */
+  #particle-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none; /* Maus durchlassen */
+  }
+
+  /* ---------- Morphing Blobs ---------- */
+  .blob-container {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    z-index: 0;
-    filter: blur(80px);
+    z-index: 1;
+    filter: blur(90px);
+    pointer-events: none;
+    transition: transform 0.2s ease-out;
   }
 
   .blob {
     position: absolute;
-    border-radius: 50%;
-    animation: float 10s infinite alternate ease-in-out;
+    width: 45vw;
+    height: 45vw;
+    opacity: 0.6;
+    animation: morph 8s infinite alternate ease-in-out, float 12s infinite alternate ease-in-out;
   }
 
   .blob-1 {
-    width: 40vw;
-    height: 40vw;
     background: #6c8cff;
     top: -10%;
     left: -10%;
   }
 
   .blob-2 {
-    width: 35vw;
-    height: 35vw;
     background: #b06cff;
     bottom: -10%;
     right: -10%;
-    animation-delay: -5s;
-    animation-duration: 12s;
+    animation-delay: -3s;
   }
 
   .blob-3 {
-    width: 25vw;
-    height: 25vw;
     background: #ff6c9c;
-    top: 40%;
+    top: 30%;
     left: 40%;
-    animation-duration: 8s;
-    animation-delay: -2s;
+    width: 35vw;
+    height: 35vw;
+    animation-duration: 10s;
+    animation-delay: -6s;
+  }
+
+  @keyframes morph {
+    0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+    34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+    67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+    100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
   }
 
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(10vw, 10vh) scale(1.2); }
+    100% { transform: translate(15vw, 15vh) scale(1.1); }
   }
 
-  /* ---------- Inhalt ---------- */
-  .content {
+  /* ---------- 3D Wrapper für den Text ---------- */
+  .wrapper {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     text-align: center;
-    mix-blend-mode: exclusion; /* Geiler Effekt beim Überfahren der Blobs */
+    mix-blend-mode: exclusion;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
   }
 
   h1 {
-    font-size: clamp(3rem, 12vw, 10rem);
-    line-height: 0.9;
+    font-size: clamp(4rem, 15vw, 12rem);
+    line-height: 0.85;
     text-transform: uppercase;
     letter-spacing: -0.05em;
     font-weight: 700;
-    pointer-events: none; /* Text blockiert nicht die Maus */
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
   }
 
-  p {
-    font-size: clamp(1rem, 2vw, 1.5rem);
-    margin-top: 20px;
-    opacity: 0.7;
-    letter-spacing: 0.2em;
+  .subtitle {
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    margin-top: 30px;
+    opacity: 0.8;
+    letter-spacing: 0.5em;
     text-transform: uppercase;
+  }
+
+  /* ---------- Noise Overlay ---------- */
+  .noise {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
     pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
   /* ---------- Custom Cursor ---------- */
-  .cursor-dot,
-  .cursor-ring {
+  .cursor {
     position: fixed;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    background: white;
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
   }
 
-  .cursor-dot {
-    width: 8px;
-    height: 8px;
-    background-color: var(--text);
-  }
-
-  .cursor-ring {
-    width: 40px;
-    height: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    transition: width 0.3s, height 0.3s, background-color 0.3s;
-  }
-
-  /* Hover-Effekt für den Cursor, wenn man über die Blobs fährt */
-  body:hover .cursor-ring {
-    width: 60px;
-    height: 60px;
-    border-color: var(--accent);
-    background-color: rgba(255, 0, 85, 0.1);
-  }
-
-  /* Auf Mobilgeräten den Cursor wieder normal machen */
+  /* Auf Mobilgeräten deaktivieren */
   @media (pointer: coarse) {
     * { cursor: auto; }
-    .cursor-dot, .cursor-ring { display: none; }
+    .cursor { display: none; }
+    .wrapper { transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-  <!-- Animierter Hintergrund -->
-  <div class="background">
+  <!-- Partikel-Hintergrund -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Farbige Blobs -->
+  <div class="blob-container" id="blobContainer">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
 
-  <!-- Inhalt -->
-  <div class="content">
-    <h1>Just<br>Vibes</h1>
-    <p>Kein Zweck. Nur Code.</p>
+  <!-- Hauptinhalt -->
+  <div class="wrapper" id="wrapper">
+    <h1 id="scramble-text">JUST<br>VIBES</h1>
+    <p class="subtitle">MAXIMUM OVERDRIVE</p>
   </div>
 
-  <!-- Custom Cursor -->
-  <div class="cursor-dot"></div>
-  <div class="cursor-ring"></div>
+  <!-- Filmkorn -->
+  <div class="noise"></div>
+
+  <!-- Mauszeiger -->
+  <div class="cursor" id="cursor"></div>
 
   <script>
-    // --- Custom Cursor Logik ---
-    const dot = document.querySelector('.cursor-dot');
-    const ring = document.querySelector('.cursor-ring');
+    // ==========================================
+    // 1. CUSTOM CURSOR & 3D TILT
+    // ==========================================
+    const cursor = document.getElementById('cursor');
+    const wrapper = document.getElementById('wrapper');
+    const blobContainer = document.getElementById('blobContainer');
+    
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
 
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
-
-    // Mausposition tracken
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      
-      // Der Punkt folgt der Maus sofort
-      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+
+      // Cursor Bewegen
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+
+      // 3D Tilt für den Text berechnen
+      const xAxis = (window.innerWidth / 2 - mouseX) / 25;
+      const yAxis = (window.innerHeight / 2 - mouseY) / 25;
+      wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+
+      // Blobs leicht in die entgegengesetzte Richtung bewegen
+      blobContainer.style.transform = `translate(${xAxis * 2}px, ${yAxis * 2}px)`;
     });
 
-    // Der Ring folgt mit einer kleinen Verzögerung (Smooth Effect)
-    function animateRing() {
-      // Lerp (Lineare Interpolation) für den weichen Follow-Effekt
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-      
-      requestAnimationFrame(animateRing);
+    // ==========================================
+    // 2. PARTIKEL CANVAS (Netzwerk-Effekt)
+    // ==========================================
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    // Canvas auf volle Größe bringen
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    animateRing();
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Partikel-Klasse
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.radius = Math.random() * 2 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        // An den Rändern abprallen
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        // Maus-Interaktion (Partikel weichen der Maus aus)
+        const dx = mouseX - this.x;
+        const dy = mouseY - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 150) {
+          const angle = Math.atan2(dy, dx);
+          this.x -= Math.cos(angle) * 2;
+          this.y -= Math.sin(angle) * 2;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fill();
+      }
+    }
+
+    // Partikel initialisieren
+    for (let i = 0; i < 100; i++) {
+      particles.push(new Particle());
+    }
+
+    // Animation Loop
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      // Verbindungen zwischen nahen Partikeln zeichnen
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            // Verbindungslinien werden transparenter, je weiter sie auseinander sind
+            ctx.strokeStyle = `rgba(108, 140, 255, ${1 - dist / 120})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ==========================================
+    // 3. TEXT SCRAMBLE EFFECT (Matrix-Style)
+    // ==========================================
+    const letters = "!<>-_\\/[]{}—=+*^?#________";
+    const textElement = document.getElementById('scramble-text');
+    
+    // Den Text bei jedem Aufruf neu "zerstören"
+    function scrambleText() {
+      let iterations = 0;
+      const targetText = "JUST\nVIBES";
+      
+      const interval = setInterval(() => {
+        textElement.innerText = targetText
+          .split("")
+          .map((letter, index) => {
+            if (index < iterations || letter === "\n") {
+              return targetText[index];
+            }
+            return letters[Math.floor(Math.random() * letters.length)];
+          })
+          .join("");
+
+        if (iterations >= targetText.length) {
+          clearInterval(interval);
+          // Nach einer Pause wieder von vorne beginnen
+          setTimeout(scrambleText, 4000); 
+        }
+        
+        iterations += 1 / 3; // Geschwindigkeit des Auflösens
+      }, 30);
+    }
+
+    // Effekt kurz nach dem Laden starten
+    setTimeout(scrambleText, 1000);
   </script>
 </body>
 </html>
